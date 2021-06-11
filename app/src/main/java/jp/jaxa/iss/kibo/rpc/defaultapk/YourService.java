@@ -48,23 +48,26 @@ public class YourService extends KiboRpcService {
         Log.d("QR info", "pos_y: " + QRpos_y);
         Log.d("QR info", "pos_z: " + QRpos_z);
 
-        // TODO: 8 patterns have different movement type, use pattern 2 for now because it's the most straight-forward
-        if (QRpattern == 1 || QRpattern == 2 || QRpattern == 3) {
-            moveToWrapper(QRpos_x, QRpos_y, QRpos_z, 0, 0, -0.707, 0.707);
+        // astrobee moves to Point A'
+        if (QRpattern == 4 || QRpattern == 5 || QRpattern == 6) {
+            double tempQRpos_x = QRpos_x - 0.4;
+            Log.d("moveToDebug", "[moveToDebug] move 1 started");
+            moveToWrapper(tempQRpos_x, -9.8, 4.85, 0, 0, -0.707, 0.707);
+            if (QRpattern == 5 || QRpattern == 6) {
+                Log.d("moveToDebug", "[moveToDebug] move 2 started");
+                moveToWrapper(tempQRpos_x, -9.8, QRpos_z, 0, 0, -0.707, 0.707);
+            }
         }
-        else if (QRpattern == 4) {
-            relativeMoveToWrapper(-0.4, 0, 0, 0, 0, 0, 0);
-            moveToWrapper(QRpos_x, QRpos_y, QRpos_z, 0, 0, -0.707, 0.707);
+        else if (QRpattern == 7) {
+            Log.d("moveToDebug", "[moveToDebug] move 1 started");
+            moveToWrapper(11.54, -9.8, 4.85, 0, 0, -0.707, 0.707);
+            Log.d("moveToDebug", "[moveToDebug] move 2 started");
+            moveToWrapper(11.54, -9.8, QRpos_z, 0, 0, -0.707, 0.707);
         }
-        else if (QRpattern == 5) {
-            Log.d("moveToDebug", "[moveToDebug] relative move 1 started");
-            relativeMoveToWrapper(-0.65, 0, 0, 0, 0, 0, 0);
-            Log.d("moveToDebug", "[moveToDebug] relative move 2 started");
-            relativeMoveToWrapper(0, 0, 0.6, 0, 0, 0, 0);
-            Log.d("moveToDebug", "[moveToDebug] move to final started");
-            moveToWrapper(QRpos_x, QRpos_y, QRpos_z, 0, 0, -0.707, 0.707);
-            Log.i("moveToDebug", "[moveToDebug] move to final ended");
-        }
+        Log.d("moveToDebug", "[moveToDebug] move final started");
+        moveToWrapper(QRpos_x, QRpos_y, QRpos_z, 0, 0, -0.707, 0.707);
+        Log.i("moveToDebug", "[moveToDebug] move final ended");
+
         // irradiate the laser
         // api.laserControl(true);
 
@@ -98,11 +101,12 @@ public class YourService extends KiboRpcService {
         final int LOOP_MAX = 3;
         final Point point = new Point(pos_x, pos_y, pos_z);
         final Quaternion quaternion = new Quaternion((float)qua_x, (float)qua_y, (float)qua_z, (float)qua_w);
-
+        Log.d("moveToDebug", "[moveToDebug] first attempt");
         Result result = api.moveTo(point, quaternion, true);
 
         int loopCounter = 0;
-        while(!result.hasSucceeded() || loopCounter < LOOP_MAX){
+        while(!result.hasSucceeded() && loopCounter < LOOP_MAX){
+            Log.d("moveToDebug", "[moveToDebug] retry attempt " + loopCounter);
             result = api.moveTo(point, quaternion, true);
             ++loopCounter;
         }
@@ -115,11 +119,12 @@ public class YourService extends KiboRpcService {
         final int LOOP_MAX = 3;
         final Point point = new Point(pos_x, pos_y, pos_z);
         final Quaternion quaternion = new Quaternion((float)qua_x, (float)qua_y, (float)qua_z, (float)qua_w);
-
+        Log.d("moveToDebug", "[moveToDebug] first attempt");
         Result result = api.relativeMoveTo(point, quaternion, true);
 
         int loopCounter = 0;
-        while(!result.hasSucceeded() || loopCounter < LOOP_MAX){
+        while(!result.hasSucceeded() && loopCounter < LOOP_MAX){
+            Log.d("moveToDebug", "[moveToDebug] retry attempt " + loopCounter);
             result = api.relativeMoveTo(point, quaternion, true);
             ++loopCounter;
         }
