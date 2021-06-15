@@ -26,11 +26,11 @@ public class YourService extends KiboRpcService {
         api.startMission();
 
         // astrobee moves to Point A
-        moveToWrapper(11.32, -9.8, 4.85, 0, 0, -0.707, 0.707);
+        moveToWrapper(11.32, -10, 4.85, 0, 0, -0.707, 0.707);
 
-        // scans QR code
+        // scans QR code (1280x960)
         Bitmap bitmap = api.getBitmapNavCam();
-        Bitmap bitmapCropped = Bitmap.createBitmap(bitmap,400,480,480,480);
+        Bitmap bitmapCropped = Bitmap.createBitmap(bitmap,370,420,540,540);
         // reads QR code
         String QRinfo = readQR(bitmapCropped);
         // send QR code info to judge
@@ -74,8 +74,26 @@ public class YourService extends KiboRpcService {
         // take snapshots
         // api.takeSnapshot();
 
-        // move to the rear of Bay7
-        // moveToWrapper(10.275, -10.314, 4.295, 0, -0.7071068, 0, 0.7071068);
+        // astrobee moves to Point B
+        if (QRpattern == 1 || QRpattern == 8) {
+            Log.d("moveToDebug", "[moveToB] move 1 started");
+            relativeMoveToWrapper(0.00,0.00, -0.5, 0.00, 0.00, 0.00, 0.00);
+        }
+        else if (QRpattern == 5 || QRpattern == 6) {
+            Log.d("moveToDebug", "[moveToB] move 1 started");
+            relativeMoveToWrapper(-0.5,0.00, 0.00, 0.00, 0.00, 0.00, 0.00);
+        }
+        else if (QRpattern == 7) {
+            Log.d("moveToDebug", "[moveToB] move 1 started");
+            moveToWrapper(11.54, -9.8, QRpos_z, 0, 0, -0.707, 0.707);
+            Log.d("moveToDebug", "[moveToB] move 2 started");
+            moveToWrapper(11.54, -9.8, 4.85, 0, 0, -0.707, 0.707);
+        }
+        Log.d("moveToDebug", "[moveToB] move pre-final started");
+        moveToWrapper(10.5, -9.4, 4.5, 0, 0, -0.707, 0.707);
+        Log.d("moveToDebug", "[moveToB] move final started");
+        moveToWrapper(10.6, -8.0, 4.5, 0, 0, -0.707, 0.707);
+        Log.i("moveToDebug", "[moveToB] move final ended");
 
         // Send mission completion
          api.reportMissionCompletion();
