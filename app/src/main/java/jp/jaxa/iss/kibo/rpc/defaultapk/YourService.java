@@ -27,10 +27,11 @@ public class YourService extends KiboRpcService {
 
         // astrobee moves to Point A
         moveToWrapper(11.32, -10, 4.85, 0, 0, -0.707, 0.707);
-
+        Log.d("moveDebug", "I am at Point A");
         // scans QR code (1280x960)
+        Log.d("navCam", "I took a QR image");
         Bitmap bitmap = api.getBitmapNavCam();
-        Bitmap bitmapCropped = Bitmap.createBitmap(bitmap,370,420,540,540);
+        Bitmap bitmapCropped = Bitmap.createBitmap(bitmap, 370, 420, 540, 540);
         // reads QR code
         String QRinfo = readQR(bitmapCropped);
         // send QR code info to judge
@@ -51,22 +52,19 @@ public class YourService extends KiboRpcService {
         // astrobee moves to Point A'
         if (QRpattern == 4 || QRpattern == 5 || QRpattern == 6) {
             double tempQRpos_x = QRpos_x - 0.4;
-            Log.d("moveToDebug", "[moveToDebug] move 1 started");
             moveToWrapper(tempQRpos_x, -9.8, 4.85, 0, 0, -0.707, 0.707);
             if (QRpattern == 5 || QRpattern == 6) {
-                Log.d("moveToDebug", "[moveToDebug] move 2 started");
                 moveToWrapper(tempQRpos_x, -9.8, QRpos_z, 0, 0, -0.707, 0.707);
             }
         }
         else if (QRpattern == 7) {
-            Log.d("moveToDebug", "[moveToDebug] move 1 started");
             moveToWrapper(11.54, -9.8, 4.85, 0, 0, -0.707, 0.707);
-            Log.d("moveToDebug", "[moveToDebug] move 2 started");
             moveToWrapper(11.54, -9.8, QRpos_z, 0, 0, -0.707, 0.707);
         }
-        Log.d("moveToDebug", "[moveToDebug] move final started");
         moveToWrapper(QRpos_x, QRpos_y, QRpos_z, 0, 0, -0.707, 0.707);
-        Log.i("moveToDebug", "[moveToDebug] move final ended");
+
+        // AR code confusion
+
 
         // irradiate the laser
         // api.laserControl(true);
@@ -76,24 +74,17 @@ public class YourService extends KiboRpcService {
 
         // astrobee moves to Point B
         if (QRpattern == 1 || QRpattern == 8) {
-            Log.d("moveToDebug", "[moveToB] move 1 started");
-            relativeMoveToWrapper(0.00,0.00, -0.5, 0.00, 0.00, 0.00, 0.00);
+            relativeMoveToWrapper(0.00, 0.00, -0.5, 0.00, 0.00, 0.00, 0.00);
         }
         else if (QRpattern == 5 || QRpattern == 6) {
-            Log.d("moveToDebug", "[moveToB] move 1 started");
-            relativeMoveToWrapper(-0.5,0.00, 0.00, 0.00, 0.00, 0.00, 0.00);
+            relativeMoveToWrapper(-0.5, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00);
         }
         else if (QRpattern == 7) {
-            Log.d("moveToDebug", "[moveToB] move 1 started");
             moveToWrapper(11.54, -9.8, QRpos_z, 0, 0, -0.707, 0.707);
-            Log.d("moveToDebug", "[moveToB] move 2 started");
             moveToWrapper(11.54, -9.8, 4.85, 0, 0, -0.707, 0.707);
         }
-        Log.d("moveToDebug", "[moveToB] move pre-final started");
         moveToWrapper(10.5, -9.4, 4.5, 0, 0, -0.707, 0.707);
-        Log.d("moveToDebug", "[moveToB] move final started");
         moveToWrapper(10.6, -8.0, 4.5, 0, 0, -0.707, 0.707);
-        Log.i("moveToDebug", "[moveToB] move final ended");
 
         // Send mission completion
          api.reportMissionCompletion();
@@ -148,7 +139,8 @@ public class YourService extends KiboRpcService {
         }
     }
 
-    private String readQR(Bitmap bitmap){
+    private String readQR(Bitmap bitmap) {
+        Log.d("readQR", "I am finding QR code");
         String result = "";
         // get the size of bitmap and get the pixel data
         int width = bitmap.getWidth();
@@ -157,18 +149,25 @@ public class YourService extends KiboRpcService {
         bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
         try {
             // convert to binary bitmap that can be handled by Zxing
+            Log.d("readQR", "1");
             LuminanceSource source = new RGBLuminanceSource(width, height, pixels);
+            Log.d("readQR", "2");
             BinaryBitmap binaryBitmap = new BinaryBitmap(new HybridBinarizer(source));
+            Log.d("readQR", "3");
 
             // read and analyze image data with Zxing
             Reader reader = new MultiFormatReader();
+            Log.d("readQR", "4");
             com.google.zxing.Result decodeResult = reader.decode(binaryBitmap);
+            Log.d("readQR", "5");
 
             // get the analysis result
             result = decodeResult.getText();
+            Log.d("readQR", "6");
         } catch (Exception e) {
             Log.e("readQR", "ERROR: " + e.getLocalizedMessage());
         }
+        Log.d("readQR", "done");
         return result;
     }
 }
